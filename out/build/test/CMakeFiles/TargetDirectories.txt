@@ -1,0 +1,5 @@
+C:/Users/Dom's PC/OneDrive/Documents/Crow Dev/casino/out/build/test/CMakeFiles/casnio.dir
+C:/Users/Dom's PC/OneDrive/Documents/Crow Dev/casino/out/build/test/CMakeFiles/package.dir
+C:/Users/Dom's PC/OneDrive/Documents/Crow Dev/casino/out/build/test/CMakeFiles/package_source.dir
+C:/Users/Dom's PC/OneDrive/Documents/Crow Dev/casino/out/build/test/CMakeFiles/edit_cache.dir
+C:/Users/Dom's PC/OneDrive/Documents/Crow Dev/casino/out/build/test/CMakeFiles/rebuild_cache.dir
