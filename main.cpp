@@ -5,7 +5,7 @@
 #include <sqltypes.h>
 #include <sql.h>
 #include <cstdlib>
-
+// teset123
 using namespace std;
 
 struct globalData {
