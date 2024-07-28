@@ -408,6 +408,17 @@ int main() {
     SQLHSTMT hStmt = SQL_NULL_HSTMT;
     globalData global;
 
+   /*
+     _____  _____    ______           __ 
+    / ____ |  __ \  / __  \ \        / / 
+    | |    | |__)  | |  |  \ \  /\  / /  
+    | |    |  _  / | |  | | \ \/  \/ /   
+    | |____| | \ \ | |__| |  \  /\  /    
+    \_____ |_|   \_\______/   \/  \/    
+                          
+   LAST UPDATED 7/28 @ 1100HRS
+   */ 
+
     while (!global.exitCheck) {
         cout << "Loading...." << endl;
         if (!initializeEnvironment(hEnv)) {
