@@ -15,6 +15,8 @@ struct globalData {
     string loginQuery;
     string passwordCheck;
     string password2;
+    bool exitCheck = false;
+    bool loginCheck = false; 
 };
 
 // Function prototypes
@@ -147,6 +149,7 @@ bool login(SQLHDBC hDbc, globalData &global) {
 
         // Output the query for debugging
         cout << "Logging you in...please wait... " << endl;
+        global.loginCheck = true; 
         Sleep(2000);
 
         // Execute SQL query
@@ -178,6 +181,7 @@ bool login(SQLHDBC hDbc, globalData &global) {
 
             cout << "Logged in successfully." << endl;
             Sleep(1500);
+            global.loginCheck = true;
             cout << "Your balance is : $" << global.balance << endl;
             Sleep(2000);
             SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
@@ -217,7 +221,7 @@ bool newUser(SQLHDBC hDbc, globalData &global) {
     }
 
     // Prepare the SQL statement
-    const char *sql = "INSERT INTO USERS (username, password, balance) VALUES (?, ?, ?)";
+    const char *sql = "INSERT INTO USERS (username, password, balance) VALUES (?, ?, 5000)";
     retCode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
     if (retCode != SQL_SUCCESS && retCode != SQL_SUCCESS_WITH_INFO) {
         cerr << "Error allocating statement handle." << endl;
@@ -247,7 +251,7 @@ bool newUser(SQLHDBC hDbc, globalData &global) {
     }
 
     SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
-    cout <<"Registration successful!" << endl <<"Returning to main menu" << endl;
+    cout <<"Registration successful!" << endl << "You have been given $5000 as a thank you for joining our casino" << endl <<"Returning to main menu" << endl;
     Sleep(2000); // Optional delay before returning to main menu
 
     return true;
@@ -286,6 +290,7 @@ bool mainMenu(SQLHDBC hDbc, globalData &global) {
             }
         } else if (regCheck == 3) { // Quit
             restartChk = true;
+            global.exitCheck = true; 
             cout << "Exiting the program. Come back soon!" << endl;
         } else {
             cerr << "Invalid option. Please enter 1, 2, or 3." << endl;
@@ -294,6 +299,12 @@ bool mainMenu(SQLHDBC hDbc, globalData &global) {
     }
 
     return true;
+}
+
+bool adminMenu(SQLHDBC hDbc, globalData &global){
+
+// admin menu logic goes here 
+
 }
 
 bool updateBalance(SQLHDBC hDbc, globalData &global) {
@@ -381,6 +392,8 @@ bool gameMenu(SQLHDBC hDbc, globalData &global) {
             Sleep(1000);
             cout << "Okay. Exiting game. Goodbye" << endl;
             gameChoiceChk = true;
+            global.exitCheck = true;
+            global.loginCheck = false; // Ensure this is set to exit the inner loop
         } else {
             cout << "Invalid choice. Please enter 1 to play the game or 9 to exit." << endl;
         }
@@ -394,43 +407,37 @@ int main() {
     SQLHDBC hDbc;
     SQLHSTMT hStmt = SQL_NULL_HSTMT;
     globalData global;
-    // double balanceCheck;
 
-    cout <<"Loading...." << endl;
-    if (!initializeEnvironment(hEnv)) {
-        return 1;
-    }
+    while (!global.exitCheck) {
+        cout << "Loading...." << endl;
+        if (!initializeEnvironment(hEnv)) {
+            return 1;
+        }
 
-    if (!connectToDatabase(hDbc, hEnv)) {
-        return 1;
-    }
-    cout <<"Loading successful." << endl;
-    
-   if (!mainMenu(hDbc, global)) {
+        if (!connectToDatabase(hDbc, hEnv)) {
+            return 1;
+        }
+        cout << "Loading successful." << endl;
+
+        if (!mainMenu(hDbc, global)) {
             cerr << "Main menu has failed to load. " << endl;
             cleanup(hEnv, hDbc, hStmt);
             // No return here, just retry
         }
 
-         
-    if (!gameMenu(hDbc, global)) {
-        cerr << "Game menu has failed to load." << endl;
-    } 
-    
+        while (global.loginCheck) {
+            if (!gameMenu(hDbc, global)) {
+                cerr << "Game menu has failed to load." << endl;
+            }
+            if (global.exitCheck) {
+                break; // Break out of the game loop if exit is requested
+            }
+        }
 
-
-
-/*     calls update balance after game is completed
-    if (updateBalance(hDbc, global)) {
-        cout << "Balance updated successfully." << endl;
-    } else {
-        cerr << "Failed to update balance." << endl;
+        // Additional checks or cleanup can be added here if necessary
     }
-*/
 
-
-// Cleanup resources and exit the program
-cleanup(hEnv, hDbc, hStmt);
-return 0;
-
+    // Cleanup resources and exit the program
+    cleanup(hEnv, hDbc, hStmt);
+    return 0;
 }
