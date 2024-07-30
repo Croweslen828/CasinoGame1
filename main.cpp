@@ -338,12 +338,18 @@ bool updateBalance(SQLHDBC hDbc, globalData &global) {
     SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
     return true;
 }
-
 bool randomNumberGame(SQLHDBC hDbc, globalData &global) {
-    bool randomNumberLoop = false;
+    bool rngRestart = false;
     char restartChoice;
+    bool rngRuleCheck = false;
+    char rngRuleChoice;
+    double rngBet;
+    bool rngBetBalanceCheck = false;
 
-    while (!randomNumberLoop) {
+    cout << "Hello and welcome to the random number game!" << endl   << "Do you need to know the rules? If so type Y" << endl;
+    cin >> rngRuleChoice;
+
+    if (rngRuleChoice == 'y' || rngRuleChoice == 'Y') {
         cout << "Okay " << global.username << ", here is how the game works:" << endl;
         Sleep(1000);
         cout << "You will select an amount to gamble." << endl;
@@ -351,28 +357,38 @@ bool randomNumberGame(SQLHDBC hDbc, globalData &global) {
         cout << "Then you will make a choice between the numbers 1 - 50. No decimal places." << endl;
         Sleep(1000);
         cout << "If you choose the right number, you will win double the amount you gambled." << endl;
-        
-        // Game logic here
+    }
 
-        cout << "Would you like to play again, " << global.username << "? Type y for yes or n for no" << endl;
-        cin >> restartChoice;
+    while (!rngRestart) {
+        cout << "Okay, let's play!" << endl;
+        cout << "Type the amount you want to bet" << endl 
+             << "You have $" << global.balance << " in your bank" << endl;
 
-        while (restartChoice != 'y' && restartChoice != 'n') {
-            cout << "Invalid choice, please try again" << endl;
-            cin >> restartChoice; // Prompt again until a valid choice is made
+        while (!rngBetBalanceCheck) {
+            cin >> rngBet;
+            if (rngBet <= global.balance) {
+                cout << "Okay, your bet of $" << rngBet << " has been accepted!" << endl;
+                rngBetBalanceCheck = true;
+            } else {
+                cout << "Incorrect, enter a bet less than your current balance of $" << global.balance << endl;
+            }
         }
 
-        if (restartChoice == 'y') {
-            cout << "Okay, starting the game again." << endl;
-            // Restart game logic or continue the loop for another round
-        } else if (restartChoice == 'n') {
-            randomNumberLoop = true; // Exit the loop
+        
+
+        cout << "Would you like to play again? Type y for yes or n for no: ";
+        cin >> restartChoice;
+        if (restartChoice == 'y' || restartChoice == 'Y') {
+            cout << "Okay, restarting the game" << endl;
+            rngBetBalanceCheck = false; // Reset the balance check for the new game
+        } else if (restartChoice == 'n' || restartChoice == 'N') {
+            cout << "Okay, bringing you back to the main menu" << endl;
+            return true;
         }
     }
 
     return true; // Indicates the function completed successfully
 }
-
 
 bool gameMenu(SQLHDBC hDbc, globalData &global) {
     int gameChoice;
